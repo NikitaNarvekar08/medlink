@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Patient Dashboard{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Welcome, "|add:user.username subtitle="Patient Dashboard" %}
+<div class="row g-3">
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-o">💊</div><h5>Search Medicines</h5><p class="small text-muted mb-0">Coming in Phase 3.</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-p">🩸</div><h5>Request Blood</h5><p class="small text-muted mb-0">Coming in Phase 3.</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-t">📋</div><h5>My Requests</h5><p class="small text-muted mb-0">Coming in Phase 3.</p></div></div>
+</div>
+{% endblock %}

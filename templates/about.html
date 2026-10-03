@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<div class="card-soft p-4 p-md-5">
+  <h2 class="fw-bold">About MedLink</h2>
+  <p>MedLink is a centralized platform that connects patients with pharmacies, blood banks, and blood donors,
+  making essential healthcare resources easier to find, request, and track.</p>
+  <div class="row g-3 mt-2">
+    <div class="col-md-3"><div class="tile"><div class="tile-icon bg-o">🧑</div><h6 class="fw-bold">Patients</h6><p class="small mb-0">Search, reserve and track.</p></div></div>
+    <div class="col-md-3"><div class="tile"><div class="tile-icon bg-t">🏥</div><h6 class="fw-bold">Pharmacies</h6><p class="small mb-0">Manage stock and reservations.</p></div></div>
+    <div class="col-md-3"><div class="tile"><div class="tile-icon bg-p">🩸</div><h6 class="fw-bold">Blood Banks</h6><p class="small mb-0">Maintain blood inventory.</p></div></div>
+    <div class="col-md-3"><div class="tile"><div class="tile-icon bg-b">🤝</div><h6 class="fw-bold">Donors</h6><p class="small mb-0">Respond to blood requests.</p></div></div>
+  </div>
+  <p class="text-muted small mt-4 mb-0">Built with Django, MongoDB and Bootstrap as an MCA mini project.</p>
+</div>
+{% endblock %}

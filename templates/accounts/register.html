@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-md-9 col-lg-6">
+    <div class="card-soft auth-card">
+      <div class="avatar-badge">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
+      </div>
+      <h4 class="text-center fw-bold mb-3">Create your account</h4>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-danger py-2 rounded-4">{{ error }}</div>
+        {% endfor %}
+        {% for field in form %}
+          <div class="mb-3" id="group_{{ field.name }}">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="btn btn-medlink w-100 mt-2" type="submit">REGISTER</button>
+      </form>
+      <p class="text-center mt-3 mb-0 small">Already registered? <a href="{% url 'login' %}" class="fw-semibold">Login</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Show only the fields that apply to the selected role
+  const role = document.getElementById('id_role');
+  function toggleFields() {
+    const v = role.value;
+    const isOrg = v === 'pharmacy' || v === 'bloodbank';
+    ['organization_name', 'license_number'].forEach(function (n) {
+      document.getElementById('group_' + n).style.display = isOrg ? '' : 'none';
+    });
+    document.getElementById('group_blood_group').style.display = (v === 'donor') ? '' : 'none';
+  }
+  role.addEventListener('change', toggleFields);
+  toggleFields();
+</script>
+{% endblock %}

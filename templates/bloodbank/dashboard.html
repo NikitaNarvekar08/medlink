@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Blood Bank Dashboard{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title=user.organization_name|default:user.username subtitle="Blood Bank Dashboard" %}
+{% if not user.is_verified %}
+  <div class="alert alert-warning rounded-4 border-0 shadow-sm">Your account is awaiting admin verification.</div>
+{% endif %}
+<div class="row g-3">
+  <div class="col-md-6"><div class="tile"><div class="tile-icon bg-p">🩸</div><h5>Blood Inventory</h5><p class="small text-muted mb-0">Coming in Phase 5.</p></div></div>
+  <div class="col-md-6"><div class="tile"><div class="tile-icon bg-b">📨</div><h5>Blood Requests</h5><p class="small text-muted mb-0">Coming in Phase 5.</p></div></div>
+</div>
+{% endblock %}

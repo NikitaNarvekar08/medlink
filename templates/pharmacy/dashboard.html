@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Pharmacy Dashboard{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title=user.organization_name|default:user.username subtitle="Pharmacy Dashboard" %}
+{% if not user.is_verified %}
+  <div class="alert alert-warning rounded-4 border-0 shadow-sm">Your account is awaiting admin verification.</div>
+{% endif %}
+<div class="row g-3">
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-o">💊</div><h5>Manage Medicines</h5><p class="small text-muted mb-0">Coming in Phase 4.</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-t">📦</div><h5>Stock</h5><p class="small text-muted mb-0">Coming in Phase 4.</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-b">🧾</div><h5>Reservations</h5><p class="small text-muted mb-0">Coming in Phase 4.</p></div></div>
+</div>
+{% endblock %}

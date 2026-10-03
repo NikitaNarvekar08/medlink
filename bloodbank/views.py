@@ -1,3 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
+from accounts.decorators import role_required
+
+
+@role_required("bloodbank")
+def dashboard(request):
+    return render(request, "bloodbank/dashboard.html")

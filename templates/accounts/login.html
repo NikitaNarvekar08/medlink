@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row align-items-center g-4 py-3">
+  <div class="col-lg-5">
+    <div class="card-soft auth-card">
+      <div class="avatar-badge">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
+      </div>
+      <h4 class="text-center fw-bold mb-3">Welcome back</h4>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-danger py-2 rounded-4">{{ error }}</div>
+        {% endfor %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn btn-medlink w-100 mt-2" type="submit">LOGIN</button>
+      </form>
+      <p class="text-center mt-3 mb-0 small">New here? <a href="{% url 'register' %}" class="fw-semibold">Create an account</a></p>
+    </div>
+  </div>
+  <div class="col-lg-6 offset-lg-1 d-none d-lg-block">
+    <h1 class="hero-title">MedLink<br>Portal</h1>
+    <p class="hero-text mt-3">Sign in to search medicines, request blood and manage healthcare resources from one place.</p>
+  </div>
+</div>
+{% endblock %}

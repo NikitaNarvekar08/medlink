@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Home{% endblock %} | MedLink</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Skyline illustration -->
+<svg class="skyline" viewBox="0 0 1440 240" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="190" rx="180" ry="70" fill="#7d9a8a" opacity=".55"/>
+  <ellipse cx="1400" cy="185" rx="200" ry="75" fill="#7d9a8a" opacity=".55"/>
+  <rect x="330" y="95" width="150" height="125" fill="#f5d9b0"/>
+  <rect x="520" y="60" width="210" height="160" fill="#f2c88f"/>
+  <rect x="520" y="60" width="210" height="14" fill="#fbe7c6"/>
+  <rect x="730" y="85" width="95" height="135" fill="#a8c9b5"/>
+  <rect x="580" y="150" width="90" height="70" fill="#5a3b32"/>
+  <rect x="860" y="105" width="75" height="115" fill="#7a4a3a"/>
+  <rect x="955" y="125" width="45" height="95" fill="#f5d9b0"/>
+  <rect x="1020" y="95" width="55" height="125" fill="#cfe3d4"/>
+  <rect x="1095" y="120" width="50" height="100" fill="#f2c88f"/>
+  <rect x="440" y="165" width="8" height="55" fill="#5a3b32"/>
+  <rect x="420" y="150" width="60" height="26" rx="3" fill="#d9582b"/>
+  <rect x="448" y="157" width="22" height="3" fill="#fff"/><rect x="448" y="164" width="22" height="3" fill="#fff"/>
+  <rect x="0" y="212" width="1440" height="28" fill="#f0b45c"/>
+  <path d="M0 232 L1440 218 L1440 240 L0 240 Z" fill="#b9bcc2"/>
+  <circle cx="170" cy="205" r="30" fill="#f2a93b"/><circle cx="235" cy="212" r="22" fill="#e07430"/>
+  <circle cx="1190" cy="203" r="36" fill="#d9582b"/><circle cx="1255" cy="210" r="26" fill="#f2a93b"/>
+  <circle cx="1380" cy="206" r="30" fill="#e07430"/>
+</svg>
+
+<nav class="navbar navbar-expand-lg navbar-light top-nav">
+  <div class="container">
+    <a class="brand" href="{% url 'home' %}"><span>&#10010;</span> MedLink</a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto ms-lg-4">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+        {% endif %}
+      </ul>
+      <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+        <a class="pill pill-dark" href="{% url 'about' %}">Help</a>
+        {% if user.is_authenticated %}
+          <span class="user-chip">{{ user.username }} &middot; {{ user.get_role_display }}</span>
+          <form method="post" action="{% url 'logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="pill pill-orange">Logout</button>
+          </form>
+        {% else %}
+          <a class="pill pill-orange" href="{% url 'login' %}">Login</a>
+          <a class="pill pill-dark" href="{% url 'register' %}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="container my-4 flex-grow-1" style="padding-bottom: 150px;">
+  {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show rounded-4 border-0 shadow-sm">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">MedLink: Smart Healthcare Network &middot; MCA Mini Project</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

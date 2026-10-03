@@ -1,0 +1,14 @@
+<div class="card-soft dash-header mb-4">
+  <div class="avatar-sm">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
+  </div>
+  <div>
+    <h4 class="mb-1 fw-bold">{{ title }}</h4>
+    <span class="role-chip">{{ user.get_role_display }}</span>
+    {% if subtitle %}<span class="text-muted small ms-2">{{ subtitle }}</span>{% endif %}
+  </div>
+  <form method="post" action="{% url 'logout' %}" class="ms-auto m-0">
+    {% csrf_token %}
+    <button type="submit" class="pill pill-orange">Logout</button>
+  </form>
+</div>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Donor Dashboard{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Welcome, "|add:user.username subtitle="Donor Dashboard" %}
+<div class="row g-3">
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-p">🩸</div><h5>Blood Group</h5><p class="fs-3 fw-bold mb-0">{{ user.blood_group|default:"Not set" }}</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-t">✅</div><h5>Availability</h5><p class="small text-muted mb-0">Coming in Phase 6.</p></div></div>
+  <div class="col-md-4"><div class="tile"><div class="tile-icon bg-b">📨</div><h5>Blood Requests</h5><p class="small text-muted mb-0">Coming in Phase 6.</p></div></div>
+</div>
+{% endblock %}

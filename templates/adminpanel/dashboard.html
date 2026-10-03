@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Admin Dashboard" subtitle="System overview" %}
+<div class="row g-3">
+  {% for label, count in stats %}
+  <div class="col-6 col-md-4 col-lg">
+    <div class="tile text-center">
+      <div class="stat-num">{{ count }}</div>
+      <div class="small text-muted">{{ label }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
