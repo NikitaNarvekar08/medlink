@@ -21,7 +21,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-     'medlink.apps.MongoAdminConfig',
+    'medlink.apps.MongoAdminConfig',
     'medlink.apps.MongoAuthConfig',
     'medlink.apps.MongoContentTypesConfig',
     'django.contrib.sessions',
@@ -131,3 +131,6 @@ MIGRATION_MODULES = {
     'auth': 'mongo_migrations.auth',
     'contenttypes': 'mongo_migrations.contenttypes',
 }
+
+# Custom user model (must be set before the first migrate)
+AUTH_USER_MODEL = 'accounts.User'
