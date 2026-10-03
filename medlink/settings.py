@@ -134,3 +134,6 @@ MIGRATION_MODULES = {
 
 # Custom user model (must be set before the first migrate)
 AUTH_USER_MODEL = 'accounts.User'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'home'

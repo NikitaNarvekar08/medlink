@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Logged out{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-md-6 col-lg-4">
+    <div class="card-soft auth-card text-center">
+      <div class="avatar-badge">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
+      </div>
+      <h4 class="fw-bold mb-2">You have been logged out</h4>
+      <p class="text-muted mb-4">Thank you for using MedLink. See you again soon!</p>
+      <a href="{% url 'login' %}" class="pill pill-orange">Login again</a>
+      <a href="{% url 'home' %}" class="pill pill-dark ms-2">Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
