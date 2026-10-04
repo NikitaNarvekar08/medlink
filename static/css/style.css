@@ -158,6 +158,7 @@ body {
 .stat-num { font-size: 2.3rem; font-weight: 800; color: var(--navy); }
 
 .site-footer { text-align: center; font-size: .8rem; color: #1e3a4a; padding: 1rem 0 .5rem; }
+
 /* ---------- Status badges and textarea ---------- */
 textarea.form-control { border-radius: 20px; }
 .st-pending   { background: #fde68a; color: #78350f; }
@@ -166,3 +167,26 @@ textarea.form-control { border-radius: 20px; }
 .st-completed { background: #bfdbfe; color: #1e3a8a; }
 .st-fulfilled { background: #bfdbfe; color: #1e3a8a; }
 .table > :not(caption) > * > * { background: transparent; }
+
+/* ---------- Password show/hide eye ---------- */
+.password-wrap { position: relative; }
+.password-wrap .form-control { padding-right: 3.2rem; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: .9rem;
+  transform: translateY(-50%);
+  display: flex;
+  border: 0;
+  background: transparent;
+  padding: .25rem;
+  line-height: 0;
+  color: #6b7280;
+  cursor: pointer;
+  z-index: 5;
+}
+.password-toggle:hover { color: var(--orange-dark); }
+.password-toggle:focus-visible { outline: 2px solid var(--orange); border-radius: 50%; }
+/* Hide Edge's own reveal button so only one eye shows, always */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display: none; }
