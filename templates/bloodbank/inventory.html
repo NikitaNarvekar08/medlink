@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Blood Inventory{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Blood Inventory" subtitle="Units available per blood group" %}
+{% include "partials/bloodbank_nav.html" with active="inventory" %}
+
+<div class="card-soft p-3">
+  <p class="small text-muted px-2 pt-2 mb-2">Enter the total units you currently hold for each group and click <strong>Set</strong>. Groups with {{ low_limit }} units or fewer are marked <strong>Low</strong>.</p>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Blood group</th><th>Units</th><th>Status</th><th>Update units</th></tr></thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td><span class="badge rounded-pill text-bg-danger fs-6">{{ r.group }}</span></td>
+          <td class="fw-semibold">{{ r.units }}</td>
+          <td>
+            {% if r.level == "out" %}<span class="badge rounded-pill text-bg-danger">Out</span>
+            {% elif r.level == "low" %}<span class="badge rounded-pill text-bg-warning">Low</span>
+            {% else %}<span class="badge rounded-pill text-bg-success">OK</span>{% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'bloodbank:inventory_set' %}" class="d-flex gap-1 m-0" style="max-width:240px">
+              {% csrf_token %}
+              <input type="hidden" name="blood_group" value="{{ r.group }}">
+              <input type="number" name="units" min="0" max="10000" value="{{ r.units }}" class="form-control form-control-sm">
+              <button type="submit" class="pill pill-dark">Set</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

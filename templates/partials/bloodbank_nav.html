@@ -1,0 +1,5 @@
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a class="pill {% if active == 'dashboard' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'bloodbank:dashboard' %}">Overview</a>
+  <a class="pill {% if active == 'inventory' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'bloodbank:inventory' %}">Blood Inventory</a>
+  <a class="pill {% if active == 'requests' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'bloodbank:requests' %}">Blood Requests</a>
+</div>

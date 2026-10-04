@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Blood Requests{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Blood Requests" subtitle="Accept or reject patient requests" %}
+{% include "partials/bloodbank_nav.html" with active="requests" %}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="pill {% if not current %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'bloodbank:requests' %}">All</a>
+  {% for value, label in statuses %}
+    <a class="pill {% if current == value %}pill-orange{% else %}pill-dark{% endif %}" href="?status={{ value }}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="card-soft p-3">
+  {% if requests_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Patient</th><th>Group</th><th>Units</th><th>Hospital</th><th>Urgency</th><th>Note</th><th>Status</th><th>Requested</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for r in requests_list %}
+        <tr>
+          <td class="fw-semibold">{{ r.patient.username }}<div class="small text-muted fw-normal">📞 {{ r.patient.phone|default:"-" }}</div></td>
+          <td><span class="badge rounded-pill text-bg-danger">{{ r.blood_group }}</span></td>
+          <td>{{ r.units_required }}</td>
+          <td>{{ r.hospital_name }}<div class="small text-muted">📍 {{ r.city }}</div></td>
+          <td>
+            {% if r.urgency == "critical" %}<span class="badge rounded-pill text-bg-danger">Critical</span>
+            {% elif r.urgency == "urgent" %}<span class="badge rounded-pill text-bg-warning">Urgent</span>
+            {% else %}<span class="badge rounded-pill text-bg-secondary">Normal</span>{% endif %}
+          </td>
+          <td class="small">{{ r.note|default:"-" }}</td>
+          <td><span class="badge rounded-pill st-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td class="small text-muted">{{ r.created_at|date:"d M Y, H:i" }}</td>
+          <td>
+            {% if r.status == "pending" %}
+              <div class="d-flex gap-1">
+                <form method="post" action="{% url 'bloodbank:request_action' r.pk 'accept' %}" class="m-0">{% csrf_token %}<button class="pill pill-orange" type="submit">Accept</button></form>
+                <form method="post" action="{% url 'bloodbank:request_action' r.pk 'reject' %}" class="m-0">{% csrf_token %}<button class="pill pill-dark" type="submit">Reject</button></form>
+              </div>
+            {% elif r.status == "accepted" %}
+              <form method="post" action="{% url 'bloodbank:request_action' r.pk 'fulfil' %}" class="m-0">{% csrf_token %}<button class="pill pill-orange" type="submit">Mark fulfilled</button></form>
+            {% else %}
+              <span class="text-muted small">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No blood requests{% if current %} with this status{% endif %}.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -2,11 +2,41 @@
 {% block title %}Blood Bank Dashboard{% endblock %}
 {% block content %}
 {% include "partials/dash_header.html" with title=user.organization_name|default:user.username subtitle="Blood Bank Dashboard" %}
+{% include "partials/bloodbank_nav.html" with active="dashboard" %}
+
 {% if not user.is_verified %}
-  <div class="alert alert-warning rounded-4 border-0 shadow-sm">Your account is awaiting admin verification.</div>
-{% endif %}
-<div class="row g-3">
-  <div class="col-md-6"><div class="tile"><div class="tile-icon bg-p">🩸</div><h5>Blood Inventory</h5><p class="small text-muted mb-0">Coming in Phase 5.</p></div></div>
-  <div class="col-md-6"><div class="tile"><div class="tile-icon bg-b">📨</div><h5>Blood Requests</h5><p class="small text-muted mb-0">Coming in Phase 5.</p></div></div>
+  <div class="alert alert-warning rounded-4 border-0 shadow-sm">Your account is awaiting admin verification. You can manage blood stock once it is verified.</div>
+{% else %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="tile text-center"><div class="stat-num">{{ total_units }}</div><div class="small text-muted">Total units in stock</div></div></div>
+  <div class="col-6 col-lg-3"><div class="tile text-center"><div class="stat-num">{{ low_groups }}</div><div class="small text-muted">Groups low / empty</div></div></div>
+  <div class="col-6 col-lg-3"><div class="tile text-center"><div class="stat-num">{{ pending }}</div><div class="small text-muted">Pending requests</div></div></div>
+  <div class="col-6 col-lg-3"><div class="tile text-center"><div class="stat-num">{{ total_requests }}</div><div class="small text-muted">All requests</div></div></div>
 </div>
+
+<div class="card-soft p-3">
+  <h5 class="fw-bold px-2 pt-2">🩸 Latest pending requests</h5>
+  {% if recent_pending %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Patient</th><th>Group</th><th>Units</th><th>Hospital</th><th>Requested</th></tr></thead>
+      <tbody>
+        {% for r in recent_pending %}
+        <tr>
+          <td class="fw-semibold">{{ r.patient.username }}</td>
+          <td><span class="badge rounded-pill text-bg-danger">{{ r.blood_group }}</span></td>
+          <td>{{ r.units_required }}</td>
+          <td>{{ r.hospital_name }}</td>
+          <td class="small text-muted">{{ r.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="px-2 py-2"><a class="pill pill-orange" href="{% url 'bloodbank:requests' %}?status=pending">Review pending</a></div>
+  {% else %}
+    <p class="px-2 pb-2 mb-0 text-muted">No pending blood requests right now.</p>
+  {% endif %}
+</div>
+{% endif %}
 {% endblock %}
