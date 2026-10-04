@@ -8,7 +8,12 @@
         <svg width="56" height="56" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
       </div>
       <h4 class="text-center fw-bold mb-3">Create your account</h4>
-      <form method="post" novalidate>
+
+      {% if form.errors %}
+        <div class="alert alert-danger py-2 rounded-4">Please fix the highlighted errors below and try again.</div>
+      {% endif %}
+
+      <form method="post">
         {% csrf_token %}
         {% for error in form.non_field_errors %}
           <div class="alert alert-danger py-2 rounded-4">{{ error }}</div>
@@ -18,7 +23,7 @@
             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
             {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
-            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            {% for error in field.errors %}<div class="text-danger small fw-semibold">{{ error }}</div>{% endfor %}
           </div>
         {% endfor %}
         <button class="btn btn-medlink w-100 mt-2" type="submit">REGISTER</button>
@@ -31,17 +36,27 @@
 
 {% block scripts %}
 <script>
-  // Show only the fields that apply to the selected role
   const role = document.getElementById('id_role');
+
+  // Show only the fields that apply to the selected role, and require them
   function toggleFields() {
     const v = role.value;
     const isOrg = v === 'pharmacy' || v === 'bloodbank';
     ['organization_name', 'license_number'].forEach(function (n) {
       document.getElementById('group_' + n).style.display = isOrg ? '' : 'none';
+      document.getElementById('id_' + n).required = isOrg;
     });
-    document.getElementById('group_blood_group').style.display = (v === 'donor') ? '' : 'none';
+    const isDonor = v === 'donor';
+    document.getElementById('group_blood_group').style.display = isDonor ? '' : 'none';
+    document.getElementById('id_blood_group').required = isDonor;
   }
   role.addEventListener('change', toggleFields);
   toggleFields();
+
+  // Phone: allow digits only, maximum 10
+  const phone = document.getElementById('id_phone');
+  phone.addEventListener('input', function () {
+    phone.value = phone.value.replace(/[^0-9]/g, '').slice(0, 10);
+  });
 </script>
 {% endblock %}

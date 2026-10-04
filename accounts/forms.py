@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from .models import User
+from .validators import validate_city, validate_email_strict, validate_phone
 
 
 class StyledFormMixin:
@@ -28,10 +29,36 @@ class RegisterForm(StyledFormMixin, UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].required = True
-        self.fields["phone"].required = True
-        self.fields["city"].required = True
+
+        # Details every user must fill in
+        for name in ("email", "phone", "city", "address"):
+            self.fields[name].required = True
+
+        # Friendlier "missing field" messages
+        for field in self.fields.values():
+            field.error_messages["required"] = f"{field.label} is required."
+
+        # Validation rules
+        self.fields["email"].validators = [validate_email_strict]
+        self.fields["phone"].validators.append(validate_phone)
+        self.fields["city"].validators.append(validate_city)
+
         self.style_fields()
+
+        # Browser-side hints (pop-up messages)
+        self.fields["email"].widget.attrs.update(
+            {"placeholder": "name@example.com"}
+        )
+        self.fields["phone"].widget.attrs.update(
+            {
+                "maxlength": "10",
+                "minlength": "10",
+                "pattern": "[0-9]{10}",
+                "inputmode": "numeric",
+                "title": "Enter exactly 10 digits (numbers only)",
+                "placeholder": "10-digit mobile number",
+            }
+        )
 
     def clean(self):
         cleaned = super().clean()
@@ -56,4 +83,6 @@ class RegisterForm(StyledFormMixin, UserCreationForm):
 class LoginForm(StyledFormMixin, AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["username"].error_messages["required"] = "Please enter your username."
+        self.fields["password"].error_messages["required"] = "Please enter your password."
         self.style_fields()

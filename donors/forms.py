@@ -1,6 +1,7 @@
 from django import forms
 
 from accounts.models import User
+from accounts.validators import validate_city, validate_phone
 
 
 class DonorProfileForm(forms.ModelForm):
@@ -18,6 +19,19 @@ class DonorProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["phone"].required = True
-        self.fields["city"].required = True
-        self.fields["blood_group"].required = True
+        for name in ("phone", "city", "address", "blood_group"):
+            self.fields[name].required = True
+            self.fields[name].error_messages["required"] = (
+                f"{self.fields[name].label} is required."
+            )
+        self.fields["phone"].validators.append(validate_phone)
+        self.fields["city"].validators.append(validate_city)
+        self.fields["phone"].widget.attrs.update(
+            {
+                "maxlength": "10",
+                "minlength": "10",
+                "pattern": "[0-9]{10}",
+                "inputmode": "numeric",
+                "title": "Enter exactly 10 digits (numbers only)",
+            }
+        )
