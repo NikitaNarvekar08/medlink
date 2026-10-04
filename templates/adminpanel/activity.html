@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}System Activity{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="System Activity" subtitle="Latest registrations, reservations and blood requests" %}
+{% include "partials/admin_nav.html" with active="activity" %}
+
+<div class="card-soft p-3">
+  {% if events %}
+  <ul class="list-group list-group-flush">
+    {% for e in events %}
+    <li class="list-group-item bg-transparent d-flex flex-wrap align-items-center gap-2">
+      <span class="fs-5">{{ e.icon }}</span>
+      <span class="flex-grow-1">{{ e.text }}</span>
+      {% if e.status %}<span class="badge rounded-pill st-{{ e.status }}">{{ e.label }}</span>{% endif %}
+      <span class="small text-muted">{{ e.time|date:"d M Y, H:i" }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No activity yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

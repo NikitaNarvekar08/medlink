@@ -1,0 +1,9 @@
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a class="pill {% if active == 'dashboard' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:dashboard' %}">Overview</a>
+  <a class="pill {% if active == 'users' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:users' %}">Users</a>
+  <a class="pill {% if active == 'medicines' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:medicines' %}">Medicines</a>
+  <a class="pill {% if active == 'inventory' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:inventory' %}">Blood Inventory</a>
+  <a class="pill {% if active == 'reservations' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:reservations' %}">Reservations</a>
+  <a class="pill {% if active == 'blood_requests' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:blood_requests' %}">Blood Requests</a>
+  <a class="pill {% if active == 'activity' %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:activity' %}">Activity</a>
+</div>

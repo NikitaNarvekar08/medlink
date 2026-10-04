@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Manage Users" subtitle="Verify, activate and deactivate accounts" %}
+{% include "partials/admin_nav.html" with active="users" %}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="pill {% if not role and not view %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:users' %}">All</a>
+  {% for value, label in role_tabs %}
+    <a class="pill {% if role == value %}pill-orange{% else %}pill-dark{% endif %}" href="?role={{ value }}">{{ label }}</a>
+  {% endfor %}
+  <a class="pill {% if view == 'pending' %}pill-orange{% else %}pill-dark{% endif %}" href="?view=pending">Pending verification</a>
+  <a class="pill {% if view == 'inactive' %}pill-orange{% else %}pill-dark{% endif %}" href="?view=inactive">Deactivated</a>
+</div>
+
+<form method="get" class="card-soft p-3 mb-3">
+  {% if role %}<input type="hidden" name="role" value="{{ role }}">{% endif %}
+  {% if view %}<input type="hidden" name="view" value="{{ view }}">{% endif %}
+  <div class="d-flex gap-2">
+    <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search by username, email, organization or city">
+    <button class="btn btn-medlink px-4" type="submit">SEARCH</button>
+  </div>
+</form>
+
+<div class="card-soft p-3">
+  {% if users_list %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Account</th><th>Type</th><th>Details</th><th>City / Phone</th><th>Verified</th><th>Active</th><th>Registered</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users_list %}
+        <tr>
+          <td class="fw-semibold">{{ u.username }}<div class="small text-muted fw-normal">{{ u.email|default:"-" }}</div></td>
+          <td>{{ u.get_role_display }}</td>
+          <td class="small">
+            {% if u.role == "pharmacy" or u.role == "bloodbank" %}
+              {{ u.organization_name|default:"-" }}<div class="text-muted">License: {{ u.license_number|default:"-" }}</div>
+            {% elif u.role == "donor" %}
+              <span class="badge rounded-pill text-bg-danger">{{ u.blood_group|default:"-" }}</span>
+              {% if u.is_available %}<span class="badge rounded-pill text-bg-success">Available</span>{% else %}<span class="badge rounded-pill text-bg-secondary">Unavailable</span>{% endif %}
+            {% else %}-{% endif %}
+          </td>
+          <td class="small">{{ u.city|default:"-" }}<div class="text-muted">📞 {{ u.phone|default:"-" }}</div></td>
+          <td>{% if u.is_verified %}<span class="badge rounded-pill text-bg-success">Verified</span>{% else %}<span class="badge rounded-pill text-bg-warning">Pending</span>{% endif %}</td>
+          <td>{% if u.is_active %}<span class="badge rounded-pill text-bg-success">Active</span>{% else %}<span class="badge rounded-pill text-bg-danger">Deactivated</span>{% endif %}</td>
+          <td class="small text-muted">{{ u.created_at|date:"d M Y" }}</td>
+          <td>
+            <div class="d-flex flex-wrap gap-1">
+              {% if u.role == "pharmacy" or u.role == "bloodbank" %}
+                {% if u.is_verified %}
+                  <form method="post" action="{% url 'adminpanel:user_action' u.pk 'unverify' %}" class="m-0">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="pill pill-dark" type="submit">Unverify</button></form>
+                {% else %}
+                  <form method="post" action="{% url 'adminpanel:user_action' u.pk 'verify' %}" class="m-0">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="pill pill-orange" type="submit">Verify</button></form>
+                {% endif %}
+              {% endif %}
+              {% if u.is_active %}
+                <form method="post" action="{% url 'adminpanel:user_action' u.pk 'deactivate' %}" class="m-0" onsubmit="return confirm('Deactivate {{ u.username|escapejs }}? They will not be able to log in.');">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="pill pill-dark" type="submit">Deactivate</button></form>
+              {% else %}
+                <form method="post" action="{% url 'adminpanel:user_action' u.pk 'activate' %}" class="m-0">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="pill pill-orange" type="submit">Activate</button></form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No accounts match this filter.</p>
+  {% endif %}
+</div>
+{% endblock %}

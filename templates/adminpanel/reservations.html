@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Medicine Reservations{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Medicine Reservations" subtitle="All patient reservations" %}
+{% include "partials/admin_nav.html" with active="reservations" %}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="pill {% if not current %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'adminpanel:reservations' %}">All</a>
+  {% for value, label in statuses %}
+    <a class="pill {% if current == value %}pill-orange{% else %}pill-dark{% endif %}" href="?status={{ value }}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="card-soft p-3">
+  {% if reservations %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Patient</th><th>Medicine</th><th>Pharmacy</th><th>Qty</th><th>Status</th><th>Requested</th></tr></thead>
+      <tbody>
+        {% for r in reservations %}
+        <tr>
+          <td class="fw-semibold">{{ r.patient.username }}</td>
+          <td>{{ r.medicine.name }}</td>
+          <td>{{ r.medicine.pharmacy.organization_name|default:r.medicine.pharmacy.username }}</td>
+          <td>{{ r.quantity }}</td>
+          <td><span class="badge rounded-pill st-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td class="small text-muted">{{ r.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No reservations{% if current %} with this status{% endif %}.</p>
+  {% endif %}
+</div>
+{% endblock %}
