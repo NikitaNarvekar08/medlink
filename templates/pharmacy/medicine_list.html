@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}My Medicines{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="My Medicines" subtitle="Manage your stock" %}
+{% include "partials/pharmacy_nav.html" with active="medicines" %}
+
+<div class="card-soft p-3 mb-4">
+  <div class="row g-2 align-items-center">
+    <div class="col-md-8">
+      <form method="get" class="d-flex gap-2 m-0">
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search your medicines">
+        <button class="btn btn-medlink px-4" type="submit">SEARCH</button>
+      </form>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <a href="{% url 'pharmacy:medicine_add' %}" class="pill pill-orange">+ Add medicine</a>
+    </div>
+  </div>
+</div>
+
+<div class="card-soft p-3">
+  {% if medicines %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Update stock</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for m in medicines %}
+        <tr>
+          <td class="fw-semibold">{{ m.name }}</td>
+          <td class="small text-muted">{{ m.category|default:"-" }}</td>
+          <td>₹{{ m.price }}</td>
+          <td>
+            {{ m.quantity }}
+            {% if m.quantity == 0 %}<span class="badge rounded-pill text-bg-danger">Out</span>
+            {% elif m.quantity <= low_limit %}<span class="badge rounded-pill text-bg-warning">Low</span>
+            {% else %}<span class="badge rounded-pill text-bg-success">OK</span>{% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'pharmacy:update_stock' m.pk %}" class="d-flex gap-1 m-0" style="min-width:170px">
+              {% csrf_token %}
+              <input type="number" name="quantity" min="0" value="{{ m.quantity }}" class="form-control form-control-sm">
+              <button type="submit" class="pill pill-dark">Set</button>
+            </form>
+          </td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'pharmacy:medicine_edit' m.pk %}" class="pill pill-orange">Edit</a>
+              <form method="post" action="{% url 'pharmacy:medicine_delete' m.pk %}" class="m-0"
+                    onsubmit="return confirm('Delete {{ m.name|escapejs }}? Its reservations will be deleted too.');">
+                {% csrf_token %}
+                <button type="submit" class="pill pill-dark">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No medicines yet. <a href="{% url 'pharmacy:medicine_add' %}">Add your first medicine</a></p>
+  {% endif %}
+</div>
+{% endblock %}

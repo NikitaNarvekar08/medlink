@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Reservations{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Reservations" subtitle="Accept or reject patient requests" %}
+{% include "partials/pharmacy_nav.html" with active="reservations" %}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="pill {% if not current %}pill-orange{% else %}pill-dark{% endif %}" href="{% url 'pharmacy:reservations' %}">All</a>
+  {% for value, label in statuses %}
+    <a class="pill {% if current == value %}pill-orange{% else %}pill-dark{% endif %}" href="?status={{ value }}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="card-soft p-3">
+  {% if reservations %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Patient</th><th>Medicine</th><th>Qty</th><th>Note</th><th>Status</th><th>Requested</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for r in reservations %}
+        <tr>
+          <td class="fw-semibold">{{ r.patient.username }}<div class="small text-muted fw-normal">📞 {{ r.patient.phone|default:"-" }}</div></td>
+          <td>{{ r.medicine.name }}<div class="small text-muted">In stock: {{ r.medicine.quantity }}</div></td>
+          <td>{{ r.quantity }}</td>
+          <td class="small">{{ r.note|default:"-" }}</td>
+          <td><span class="badge rounded-pill st-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td class="small text-muted">{{ r.created_at|date:"d M Y, H:i" }}</td>
+          <td>
+            {% if r.status == "pending" %}
+              <div class="d-flex gap-1">
+                <form method="post" action="{% url 'pharmacy:reservation_action' r.pk 'accept' %}" class="m-0">{% csrf_token %}<button class="pill pill-orange" type="submit">Accept</button></form>
+                <form method="post" action="{% url 'pharmacy:reservation_action' r.pk 'reject' %}" class="m-0">{% csrf_token %}<button class="pill pill-dark" type="submit">Reject</button></form>
+              </div>
+            {% elif r.status == "accepted" %}
+              <form method="post" action="{% url 'pharmacy:reservation_action' r.pk 'complete' %}" class="m-0">{% csrf_token %}<button class="pill pill-orange" type="submit">Mark completed</button></form>
+            {% else %}
+              <span class="text-muted small">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No reservations{% if current %} with this status{% endif %}.</p>
+  {% endif %}
+</div>
+{% endblock %}
