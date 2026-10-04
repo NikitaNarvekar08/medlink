@@ -158,3 +158,11 @@ body {
 .stat-num { font-size: 2.3rem; font-weight: 800; color: var(--navy); }
 
 .site-footer { text-align: center; font-size: .8rem; color: #1e3a4a; padding: 1rem 0 .5rem; }
+/* ---------- Status badges and textarea ---------- */
+textarea.form-control { border-radius: 20px; }
+.st-pending   { background: #fde68a; color: #78350f; }
+.st-accepted  { background: #bbf7d0; color: #14532d; }
+.st-rejected  { background: #fecaca; color: #7f1d1d; }
+.st-completed { background: #bfdbfe; color: #1e3a8a; }
+.st-fulfilled { background: #bfdbfe; color: #1e3a8a; }
+.table > :not(caption) > * > * { background: transparent; }

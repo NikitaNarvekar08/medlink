@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Search Medicines{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Search Medicines" subtitle="Check availability and reserve" %}
+
+<form method="get" class="card-soft p-3 mb-4">
+  <div class="row g-2">
+    <div class="col-md-5">
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Medicine name, e.g. Paracetamol">
+    </div>
+    <div class="col-md-4">
+      <input type="text" name="city" value="{{ city }}" class="form-control" placeholder="City (optional)">
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-medlink w-100" type="submit">SEARCH</button>
+    </div>
+  </div>
+</form>
+
+{% if medicines %}
+<div class="row g-3">
+  {% for m in medicines %}
+  <div class="col-md-6 col-lg-4">
+    <div class="tile">
+      <div class="d-flex justify-content-between align-items-start">
+        <h5 class="mb-1">{{ m.name }}</h5>
+        {% if m.quantity > 0 %}
+          <span class="badge rounded-pill text-bg-success">In stock</span>
+        {% else %}
+          <span class="badge rounded-pill text-bg-danger">Out of stock</span>
+        {% endif %}
+      </div>
+      <p class="small text-muted mb-2">{{ m.category|default:"General" }}</p>
+      <p class="fw-semibold mb-1">₹{{ m.price }} <span class="small text-muted fw-normal">&middot; {{ m.quantity }} units</span></p>
+      <p class="small mb-3">
+        🏥 {{ m.pharmacy_obj.organization_name|default:m.pharmacy_obj.username }}<br>
+        📍 {{ m.pharmacy_obj.city }}
+      </p>
+      <a class="pill pill-orange" href="{% url 'patients:medicine_detail' m.pk %}">View details</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card-soft p-4 text-center">
+  <p class="mb-0">No medicines found. Try a different name or city.</p>
+</div>
+{% endif %}
+{% endblock %}

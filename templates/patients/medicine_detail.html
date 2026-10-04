@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{{ medicine.name }}{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title=medicine.name subtitle="Medicine details" %}
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="tile">
+      <div class="tile-icon bg-o">💊</div>
+      <h5>{{ medicine.name }}</h5>
+      <p class="small text-muted">{{ medicine.category|default:"General" }}</p>
+      {% if medicine.description %}<p>{{ medicine.description }}</p>{% endif %}
+      <p class="fs-5 fw-bold mb-2">₹{{ medicine.price }}</p>
+      {% if medicine.quantity > 0 %}
+        <span class="badge rounded-pill text-bg-success">{{ medicine.quantity }} units available</span>
+      {% else %}
+        <span class="badge rounded-pill text-bg-danger">Out of stock</span>
+      {% endif %}
+      <hr>
+      <h6 class="fw-bold">Pharmacy</h6>
+      <p class="small mb-0">
+        🏥 {{ pharmacy.organization_name|default:pharmacy.username }}<br>
+        📍 {{ pharmacy.address }}{% if pharmacy.address and pharmacy.city %}, {% endif %}{{ pharmacy.city }}<br>
+        📞 {{ pharmacy.phone }}
+      </p>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card-soft p-4">
+      <h5 class="fw-bold mb-3">Reserve this medicine</h5>
+      {% if medicine.quantity > 0 %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.quantity.id_for_label }}">Quantity</label>
+          {{ form.quantity }}
+          {% for e in form.quantity.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+          {{ form.note }}
+        </div>
+        <button class="btn btn-medlink w-100" type="submit">SUBMIT RESERVATION</button>
+      </form>
+      {% else %}
+        <div class="alert alert-warning rounded-4 border-0 mb-0">This medicine is currently out of stock, so it can't be reserved.</div>
+      {% endif %}
+      <a href="{% url 'patients:medicine_search' %}" class="d-block text-center mt-3 small">&larr; Back to search</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

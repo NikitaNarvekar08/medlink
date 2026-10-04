@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Request Blood{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Request Blood" subtitle="Find blood banks and donors" %}
+
+<form method="get" class="card-soft p-4 mb-4" novalidate>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label" for="{{ form.blood_group.id_for_label }}">Blood group</label>
+      {{ form.blood_group }}
+      {% for e in form.blood_group.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="col-md-2">
+      <label class="form-label" for="{{ form.units.id_for_label }}">{{ form.units.label }}</label>
+      {{ form.units }}
+      {% for e in form.units.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="{{ form.city.id_for_label }}">City</label>
+      {{ form.city }}
+      {% for e in form.city.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label" for="{{ form.urgency.id_for_label }}">Urgency</label>
+      {{ form.urgency }}
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form.hospital_name.id_for_label }}">{{ form.hospital_name.label }}</label>
+      {{ form.hospital_name }}
+      {% for e in form.hospital_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="col-md-6">
+      <label class="form-label" for="{{ form.note.id_for_label }}">{{ form.note.label }}</label>
+      {{ form.note }}
+    </div>
+    <div class="col-12">
+      <button class="btn btn-medlink px-5" type="submit">FIND BLOOD BANKS &amp; DONORS</button>
+    </div>
+  </div>
+</form>
+
+{% if searched %}
+
+<h4 class="fw-bold mb-3">🏥 Blood banks with {{ params.blood_group }}</h4>
+{% if banks %}
+<div class="row g-3 mb-4">
+  {% for b in banks %}
+  <div class="col-md-6 col-lg-4">
+    <div class="tile">
+      <div class="d-flex justify-content-between align-items-start">
+        <h5 class="mb-1">{{ b.bank.organization_name|default:b.bank.username }}</h5>
+        {% if b.same_city %}<span class="badge rounded-pill text-bg-info">Same city</span>{% endif %}
+      </div>
+      <p class="small mb-1">📍 {{ b.bank.address }}{% if b.bank.address and b.bank.city %}, {% endif %}{{ b.bank.city }}</p>
+      <p class="mb-3">
+        <strong>{{ b.units }}</strong> units available
+        {% if b.enough %}
+          <span class="badge rounded-pill text-bg-success">Enough stock</span>
+        {% else %}
+          <span class="badge rounded-pill text-bg-warning">Limited stock</span>
+        {% endif %}
+      </p>
+      <form method="post" action="{% url 'patients:blood_send' %}" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="recipient_id" value="{{ b.bank.pk }}">
+        {% for k, v in params.items %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+        <button type="submit" class="pill pill-orange">Send request</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card-soft p-3 mb-4 text-center text-muted">No registered blood bank currently has {{ params.blood_group }} in stock.</div>
+{% endif %}
+
+<h4 class="fw-bold mb-3">🤝 Available {{ params.blood_group }} donors</h4>
+{% if donors %}
+<div class="row g-3 mb-4">
+  {% for d in donors %}
+  <div class="col-md-6 col-lg-4">
+    <div class="tile">
+      <div class="d-flex justify-content-between align-items-start">
+        <h5 class="mb-1">{{ d.donor.username }}</h5>
+        {% if d.same_city %}<span class="badge rounded-pill text-bg-info">Same city</span>{% endif %}
+      </div>
+      <p class="small mb-1">📍 {{ d.donor.city }}</p>
+      <p class="mb-3">
+        <span class="badge rounded-pill text-bg-danger">{{ d.donor.blood_group }}</span>
+        <span class="badge rounded-pill text-bg-success">Available</span>
+      </p>
+      <form method="post" action="{% url 'patients:blood_send' %}" class="m-0">
+        {% csrf_token %}
+        <input type="hidden" name="recipient_id" value="{{ d.donor.pk }}">
+        {% for k, v in params.items %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+        <button type="submit" class="pill pill-orange">Send request</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card-soft p-3 mb-4 text-center text-muted">No available {{ params.blood_group }} donors found right now.</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

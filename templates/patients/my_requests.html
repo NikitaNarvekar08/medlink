@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}My Requests{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="My Requests" subtitle="Track your reservations and blood requests" %}
+
+<div class="card-soft p-3 mb-4">
+  <h5 class="fw-bold px-2 pt-2">💊 Medicine reservations</h5>
+  {% if reservations %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Medicine</th><th>Pharmacy</th><th>Qty</th><th>Status</th><th>Requested</th></tr>
+      </thead>
+      <tbody>
+        {% for r in reservations %}
+        <tr>
+          <td class="fw-semibold">{{ r.medicine.name }}</td>
+          <td>{{ r.medicine.pharmacy.organization_name|default:r.medicine.pharmacy.username }}</td>
+          <td>{{ r.quantity }}</td>
+          <td><span class="badge rounded-pill st-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td class="small text-muted">{{ r.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 pb-2 mb-0 text-muted">No reservations yet. <a href="{% url 'patients:medicine_search' %}">Search medicines</a></p>
+  {% endif %}
+</div>
+
+<div class="card-soft p-3">
+  <h5 class="fw-bold px-2 pt-2">🩸 Blood requests</h5>
+  {% if blood_requests %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr><th>Sent to</th><th>Group</th><th>Units</th><th>Urgency</th><th>Status</th><th>Contact</th><th>Requested</th></tr>
+      </thead>
+      <tbody>
+        {% for b in blood_requests %}
+        <tr>
+          <td class="fw-semibold">
+            {{ b.recipient.organization_name|default:b.recipient.username }}
+            <div class="small text-muted fw-normal">{{ b.recipient.get_role_display }}</div>
+          </td>
+          <td><span class="badge rounded-pill text-bg-danger">{{ b.blood_group }}</span></td>
+          <td>{{ b.units_required }}</td>
+          <td>{{ b.get_urgency_display }}</td>
+          <td><span class="badge rounded-pill st-{{ b.status }}">{{ b.get_status_display }}</span></td>
+          <td class="small">
+            {% if b.status == "accepted" or b.status == "fulfilled" %}📞 {{ b.recipient.phone|default:"-" }}{% else %}<span class="text-muted">Shown after acceptance</span>{% endif %}
+          </td>
+          <td class="small text-muted">{{ b.created_at|date:"d M Y, H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="px-2 pb-2 mb-0 text-muted">No blood requests yet. <a href="{% url 'patients:blood_request' %}">Request blood</a></p>
+  {% endif %}
+</div>
+{% endblock %}
