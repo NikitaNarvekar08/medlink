@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="My Profile" subtitle="Keep your details up to date" %}
+{% include "partials/donor_nav.html" with active="profile" %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card-soft p-4">
+      <p class="small text-muted mb-3">Username: <strong>{{ user.username }}</strong> &middot; Email: <strong>{{ user.email|default:"-" }}</strong></p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          {% if field.name == "is_available" %}
+            <div class="form-check form-switch mb-3">
+              {{ field }}
+              <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </div>
+          {% else %}
+            <div class="mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+        <button class="btn btn-medlink w-100 mt-2" type="submit">SAVE PROFILE</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
