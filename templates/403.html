@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Access denied{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-md-6 col-lg-5">
+    <div class="card-soft auth-card text-center">
+      <div class="avatar-badge">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="#15151f"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c0-4.7 3.8-7.5 8.5-7.5s8.5 2.8 8.5 7.5z"/></svg>
+      </div>
+      <h4 class="fw-bold mb-2">Access denied</h4>
+      <p class="text-muted mb-4">Your account type doesn't have permission to open this page.</p>
+      <a href="{% url 'dashboard' %}" class="pill pill-orange">Go to my dashboard</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
