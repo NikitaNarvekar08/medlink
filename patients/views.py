@@ -2,10 +2,12 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from accounts.decorators import role_required
 from accounts.models import User
 from bloodbank.models import BloodInventory, BloodRequest
+from notifications.utils import notify
 from pharmacy.models import Medicine, MedicineReservation
 
 from .forms import BloodRequestForm, ReservationForm
@@ -127,6 +129,12 @@ def medicine_detail(request, pk):
                     note=form.cleaned_data["note"],
                     status=MedicineReservation.Status.PENDING,
                 )
+                notify(
+                    pharmacy,
+                    f"New reservation: {request.user.username} reserved "
+                    f"{qty} x {medicine.name}.",
+                    reverse("pharmacy:reservations"),
+                )
                 messages.success(
                     request,
                     "Reservation request sent. The pharmacy will accept or reject it.",
@@ -209,6 +217,19 @@ def blood_send(request):
         note=data["note"],
         status=BloodRequest.Status.PENDING,
     )
+
+    link = (
+        reverse("bloodbank:requests")
+        if recipient.role == "bloodbank"
+        else reverse("donors:requests")
+    )
+    notify(
+        recipient,
+        f"New {data['blood_group']} blood request from {request.user.username} "
+        f"({data['units']} unit(s)) at {data['hospital_name']}.",
+        link,
+    )
+
     messages.success(request, "Blood request sent. You can track it here.")
     return redirect("patients:my_requests")
 

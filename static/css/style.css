@@ -190,3 +190,31 @@ textarea.form-control { border-radius: 20px; }
 /* Hide Edge's own reveal button so only one eye shows, always */
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear { display: none; }
+/* ---------- Notifications ---------- */
+.notif-bell {
+  position: relative;
+  text-decoration: none;
+  font-size: 1.15rem;
+  background: rgba(255, 255, 255, .75);
+  border-radius: 999px;
+  padding: .2rem .7rem;
+  line-height: 1.6;
+}
+.notif-count {
+  position: absolute;
+  top: -5px;
+  right: -3px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 999px;
+  font-size: .65rem;
+  font-weight: 700;
+  padding: .1rem .4rem;
+}
+.notif-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--orange);
+  flex-shrink: 0;
+}

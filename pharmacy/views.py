@@ -4,9 +4,11 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
+from notifications.utils import notify
 
 from .forms import MedicineForm
 from .models import Medicine, MedicineReservation
@@ -162,6 +164,8 @@ def reservation_action(request, pk, action):
         raise Http404
 
     S = MedicineReservation.Status
+    shop = request.user.organization_name or request.user.username
+    link = reverse("patients:my_requests")
 
     if action == "accept" and reservation.status == S.PENDING:
         if reservation.quantity > medicine.quantity:
@@ -175,17 +179,31 @@ def reservation_action(request, pk, action):
             medicine.save(update_fields=["quantity", "updated_at"])
             reservation.status = S.ACCEPTED
             reservation.save(update_fields=["status", "updated_at"])
-            messages.success(
-                request, "Reservation accepted and stock updated."
+            messages.success(request, "Reservation accepted and stock updated.")
+            notify(
+                reservation.patient,
+                f"{shop} accepted your reservation for "
+                f"{reservation.quantity} x {medicine.name}.",
+                link,
             )
     elif action == "reject" and reservation.status == S.PENDING:
         reservation.status = S.REJECTED
         reservation.save(update_fields=["status", "updated_at"])
         messages.success(request, "Reservation rejected.")
+        notify(
+            reservation.patient,
+            f"{shop} rejected your reservation for {medicine.name}.",
+            link,
+        )
     elif action == "complete" and reservation.status == S.ACCEPTED:
         reservation.status = S.COMPLETED
         reservation.save(update_fields=["status", "updated_at"])
         messages.success(request, "Reservation marked as completed.")
+        notify(
+            reservation.patient,
+            f"Your reservation for {medicine.name} at {shop} is completed.",
+            link,
+        )
     else:
         messages.error(request, "That action isn't allowed for this reservation.")
 

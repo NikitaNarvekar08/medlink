@@ -9,4 +9,5 @@ urlpatterns = [
     path("bloodbank/", include("bloodbank.urls")),
     path("donor/", include("donors.urls")),
     path("admin-panel/", include("adminpanel.urls")),
+    path("notifications/", include("notifications.urls")),
 ]

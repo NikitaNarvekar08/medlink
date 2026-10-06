@@ -2,10 +2,12 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
 from bloodbank.models import BloodRequest
+from notifications.utils import notify
 
 from .forms import DonorProfileForm
 
@@ -83,6 +85,8 @@ def request_action(request, pk, action):
         raise Http404
 
     S = BloodRequest.Status
+    who = request.user.username
+    link = reverse("patients:my_requests")
 
     if action == "accept" and blood_request.status == S.PENDING:
         if blood_request.blood_group != request.user.blood_group:
@@ -102,14 +106,29 @@ def request_action(request, pk, action):
             messages.success(
                 request, "Request accepted. The patient can now see your phone number."
             )
+            notify(
+                blood_request.patient,
+                f"Donor {who} accepted your {blood_request.blood_group} blood request.",
+                link,
+            )
     elif action == "reject" and blood_request.status == S.PENDING:
         blood_request.status = S.REJECTED
         blood_request.save(update_fields=["status", "updated_at"])
         messages.success(request, "Request rejected.")
+        notify(
+            blood_request.patient,
+            f"Donor {who} could not accept your {blood_request.blood_group} request.",
+            link,
+        )
     elif action == "fulfil" and blood_request.status == S.ACCEPTED:
         blood_request.status = S.FULFILLED
         blood_request.save(update_fields=["status", "updated_at"])
         messages.success(request, "Marked as fulfilled. Thank you for donating!")
+        notify(
+            blood_request.patient,
+            f"Donor {who} marked your {blood_request.blood_group} request as fulfilled.",
+            link,
+        )
     else:
         messages.error(request, "That action isn't allowed for this request.")
 

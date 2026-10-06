@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from accounts.decorators import role_required
 from accounts.models import User
 from bloodbank.models import BLOOD_GROUPS, BloodInventory, BloodRequest
+from notifications.utils import notify
 from pharmacy.models import Medicine, MedicineReservation
 
 GROUPS = [g for g, _ in BLOOD_GROUPS]
@@ -120,10 +121,20 @@ def user_action(request, pk, action):
         target.is_verified = True
         target.save(update_fields=["is_verified"])
         messages.success(request, f"{target.username} is now verified.")
+        notify(
+            target,
+            "Your account has been verified by the admin. You can now use all features.",
+            reverse("dashboard"),
+        )
     elif action == "unverify" and target.role in ORG_ROLES:
         target.is_verified = False
         target.save(update_fields=["is_verified"])
         messages.success(request, f"Verification removed from {target.username}.")
+        notify(
+            target,
+            "Your account verification was removed by the admin. Please contact support.",
+            reverse("dashboard"),
+        )
     elif action == "activate":
         target.is_active = True
         target.save(update_fields=["is_active"])

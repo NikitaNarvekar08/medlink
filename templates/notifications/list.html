@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+{% include "partials/dash_header.html" with title="Notifications" subtitle="Updates about your requests and account" %}
+
+{% if unread_count %}
+<div class="mb-3">
+  <form method="post" action="{% url 'notifications:read_all' %}" class="m-0">
+    {% csrf_token %}
+    <button type="submit" class="pill pill-dark">Mark all as read</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card-soft p-3">
+  {% if items %}
+  <ul class="list-group list-group-flush">
+    {% for n in items %}
+    <li class="list-group-item bg-transparent d-flex flex-wrap align-items-center gap-2">
+      {% if not n.is_read %}<span class="notif-dot"></span>{% endif %}
+      <span class="flex-grow-1 {% if not n.is_read %}fw-semibold{% endif %}">{{ n.message }}</span>
+      <span class="small text-muted">{{ n.created_at|date:"d M Y, H:i" }}</span>
+      <form method="post" action="{% url 'notifications:open' n.pk %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="pill {% if n.is_read %}pill-dark{% else %}pill-orange{% endif %}">{% if n.link %}Open{% else %}Mark read{% endif %}</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p class="px-2 py-3 mb-0 text-muted text-center">No notifications yet. Updates about your requests will appear here.</p>
+  {% endif %}
+</div>
+{% endblock %}

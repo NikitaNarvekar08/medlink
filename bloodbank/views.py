@@ -4,9 +4,11 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
+from notifications.utils import notify
 
 from .models import BLOOD_GROUPS, BloodInventory, BloodRequest
 
@@ -153,6 +155,8 @@ def request_action(request, pk, action):
         raise Http404
 
     S = BloodRequest.Status
+    who = request.user.organization_name or request.user.username
+    link = reverse("patients:my_requests")
 
     if action == "accept" and blood_request.status == S.PENDING:
         if _deduct_units(
@@ -161,6 +165,11 @@ def request_action(request, pk, action):
             blood_request.status = S.ACCEPTED
             blood_request.save(update_fields=["status", "updated_at"])
             messages.success(request, "Request accepted and blood stock updated.")
+            notify(
+                blood_request.patient,
+                f"{who} accepted your {blood_request.blood_group} blood request.",
+                link,
+            )
         else:
             have = _stock_by_group(request.user)[blood_request.blood_group]
             messages.error(
@@ -173,10 +182,20 @@ def request_action(request, pk, action):
         blood_request.status = S.REJECTED
         blood_request.save(update_fields=["status", "updated_at"])
         messages.success(request, "Request rejected.")
+        notify(
+            blood_request.patient,
+            f"{who} rejected your {blood_request.blood_group} blood request.",
+            link,
+        )
     elif action == "fulfil" and blood_request.status == S.ACCEPTED:
         blood_request.status = S.FULFILLED
         blood_request.save(update_fields=["status", "updated_at"])
         messages.success(request, "Request marked as fulfilled.")
+        notify(
+            blood_request.patient,
+            f"Your {blood_request.blood_group} blood request was fulfilled by {who}.",
+            link,
+        )
     else:
         messages.error(request, "That action isn't allowed for this request.")
 
